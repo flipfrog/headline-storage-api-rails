@@ -1,14 +1,26 @@
 module Api
   # Headline Resource Class
   class HeadlinesController < ActionController::API
-    CATEGORIES = %w[book-digital book-paper sound-file sound-cd sound-vinyl bookmark-network].freeze
 
     def headline_params
       params.require(:headline).permit(:category, :title, :description)
     end
 
     def index
-      render json: { headlines: Headline.all }
+      categories = (params[:categories] || '')
+                   .split(',')
+                   .select { |category| Headline::CATEGORIES.include? category }
+      headlines = Headline
+                  .then { |relation | search_by_categories(relation, categories) }
+      render json: { headlines: }
+    end
+
+    def search_by_categories(relation, categories)
+      if categories.length.positive?
+        relation.where(category: categories)
+      else
+        relation.all
+      end
     end
 
     def show
@@ -16,7 +28,7 @@ module Api
     end
 
     def create
-      headline = Headline.create(headline_params)
+      headline = Headline.create!(headline_params)
       render json: { headline: }
     end
 
