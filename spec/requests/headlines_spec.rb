@@ -67,7 +67,7 @@ describe 'Headlines' do
     end
   end
 
-  describe 'GET /api/headlines/:id' do
+  describe 'GET /api/headlines' do
     let(:headlines_id) { '' }
     let!(:expected) { create(:headline, { title: 'test title', category: 'sound-cd' }) }
 
@@ -108,9 +108,23 @@ describe 'Headlines' do
     end
   end
 
-  describe 'POST /api/headlines/:id' do
+  describe 'POST /api/headlines' do
+    let(:params) { { title: 'test title', category: 'sound-cd', description: 'test description' } }
+    subject do
+      post api_headlines_path, params: params, as: :json
+    end
+
     context 'with valid params' do
-      it 'stores headline'
+      it 'stores headline' do
+        subject
+
+        expect(response).to have_http_status(:success)
+        expect(Headline.last).to have_attributes(
+          title: 'test title',
+          category: 'sound-cd',
+          description: 'test description'
+        )
+      end
 
       it 'stores headline with null description'
 
@@ -128,9 +142,25 @@ describe 'Headlines' do
     end
   end
 
-  describe 'PUT /api/headlines/:id' do
+  describe 'PUT /api/headlines' do
+    let!(:headline) { create(:headline, { title: 'test title', category: 'sound-cd' }) }
+    let(:params) { { title: 'test title-x', category: 'sound-vinyl', description: 'test description' } }
+
+    subject do
+      put api_headline_path(headline.id), params: params, as: :json
+    end
+
     context 'with valid params' do
-      it 'updates headline'
+      it 'updates headline' do
+        subject
+
+        expect(response).to have_http_status(:success)
+        expect(Headline.find(headline.id)).to have_attributes(
+          title: 'test title-x',
+          category: 'sound-vinyl',
+          description: 'test description'
+        )
+      end
 
       it 'updates headline with null subscription'
 
@@ -148,9 +178,20 @@ describe 'Headlines' do
     end
   end
 
-  describe 'DELETE /api/headlines/:id' do
+  describe 'DELETE /api/headlines' do
+    let!(:headline) { create(:headline, { title: 'test title', category: 'sound-cd' }) }
+
+    subject do
+      delete api_headline_path(headline.id)
+    end
+
     context 'with valid params' do
-      it 'deletes headline'
+      it 'deletes headline' do
+        subject
+
+        expect(response).to have_http_status(:success)
+        expect(Headline.exists?(headline.id)).to eq(false)
+      end
 
       it 'deletes headline having refs'
     end
