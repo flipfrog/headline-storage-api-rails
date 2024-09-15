@@ -184,15 +184,36 @@ describe 'Headlines' do
         )
       end
 
-      it 'updates headline with null subscription'
+      it 'updates headline with nil description' do
+        params['description'] = nil
+        subject
+
+        expect(Headline.find(headline.id)).to have_attributes(
+          title: 'test title-x',
+          category: 'sound-vinyl',
+          description: nil
+        )
+      end
 
       it 'updates headline with refs'
     end
 
     context 'with invalid params' do
-      it 'to update headline with long title'
+      it 'to update headline with long title' do
+        params['title'] = 'a' * 101
 
-      it 'to update headline with invalid category'
+        subject
+
+        expect(response).to have_http_status(422)
+      end
+
+      it 'to update headline with invalid category' do
+        params['category'] = 'invalid'
+
+        subject
+
+        expect(response).to have_http_status(422)
+      end
 
       it 'to update headline with duplicate forward refs'
 
@@ -215,11 +236,27 @@ describe 'Headlines' do
         expect(Headline.exists?(headline.id)).to eq(false)
       end
 
-      it 'deletes headline having refs'
+      it 'deletes headline having refs' do
+        headline2 = create(:headline, { title: 'test title 2', category: 'sound-file' })
+        headline.forwardRefs << headline2
+        headline.reload
+        expect(headline2.backwardRefs.pluck('id')).to eq([headline.id])
+
+        subject
+
+        expect(response).to have_http_status(:success)
+        expect(Headline.exists?(headline.id)).to eq(false)
+        expect(Headline.exists?(headline2.id)).to eq(true)
+        expect(headline2.backwardRefs).to eq([])
+      end
     end
 
     context 'with invalid params' do
-      it 'to delete headline with invalid id'
+      it 'to delete headline with invalid id' do
+        delete api_headline_path(headline.id + 1)
+
+        expect(response).to have_http_status(404)
+      end
     end
   end
 end
