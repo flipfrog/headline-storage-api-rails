@@ -12,6 +12,7 @@ module Api
                    .select { |category| Headline::CATEGORIES.include? category }
       headlines = Headline
                   .then { |relation| search_by_categories(relation, categories) }
+                  .order :id
       render json: { headlines: }, include: %i[forwardRefs backwardRefs]
     end
 
