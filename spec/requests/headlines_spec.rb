@@ -100,7 +100,7 @@ describe 'Headlines' do
     context 'with invalid id parameters' do
       let(:headlines_id) { expected.id + 1 }
 
-      it 'gets headline' do
+      it 'to get headline' do
         subject
 
         expect(response).to have_http_status(404)
@@ -109,14 +109,54 @@ describe 'Headlines' do
   end
 
   describe 'POST /api/headlines/:id' do
+    context 'with valid params' do
+      it 'stores headline'
 
+      it 'stores headline with null description'
+
+      it 'stores headline with refs'
+    end
+
+    context 'with invalid params' do
+      it 'to store headline with long title'
+
+      it 'to store headline with invalid category'
+
+      it 'to store headline with duplicate forward refs'
+
+      it 'to store headline with duplicate backward refs'
+    end
   end
 
   describe 'PUT /api/headlines/:id' do
+    context 'with valid params' do
+      it 'updates headline'
 
+      it 'updates headline with null subscription'
+
+      it 'updates headline with refs'
+    end
+
+    context 'with invalid params' do
+      it 'to update headline with long title'
+
+      it 'to update headline with invalid category'
+
+      it 'to update headline with duplicate forward refs'
+
+      it 'to update headline with duplicate backward refs'
+    end
   end
 
   describe 'DELETE /api/headlines/:id' do
+    context 'with valid params' do
+      it 'deletes headline'
 
+      it 'deletes headline having refs'
+    end
+
+    context 'with invalid params' do
+      it 'to delete headline with invalid id'
+    end
   end
 end
