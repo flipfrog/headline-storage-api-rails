@@ -126,15 +126,37 @@ describe 'Headlines' do
         )
       end
 
-      it 'stores headline with null description'
+      it 'stores headline with nil description' do
+        params['description'] = nil
+        subject
+
+        expect(response).to have_http_status(:success)
+        expect(Headline.last).to have_attributes(
+          title: 'test title',
+          category: 'sound-cd',
+          description: nil
+        )
+      end
 
       it 'stores headline with refs'
     end
 
     context 'with invalid params' do
-      it 'to store headline with long title'
+      it 'to store headline with long title' do
+        params['title'] = 'a' * 101
 
-      it 'to store headline with invalid category'
+        subject
+
+        expect(response).to have_http_status(422)
+      end
+
+      it 'to store headline with invalid category' do
+        params['category'] = 'invalid'
+
+        subject
+
+        expect(response).to have_http_status(422)
+      end
 
       it 'to store headline with duplicate forward refs'
 
