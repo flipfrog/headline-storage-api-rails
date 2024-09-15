@@ -4,7 +4,7 @@
 class Headline < ActiveRecord::Base
   CATEGORIES = %w[book-digital book-paper sound-file sound-cd sound-vinyl bookmark-network].freeze
   validates :category, presence: true, inclusion: CATEGORIES
-  validates :title, presence: true
+  validates :title, presence: true, length: { maximum: 100 }
 
   has_and_belongs_to_many :forwardRefs,
                           join_table: 'headlines_headlines',
