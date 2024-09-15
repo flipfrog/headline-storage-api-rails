@@ -11,8 +11,8 @@ module Api
                    .split(',')
                    .select { |category| Headline::CATEGORIES.include? category }
       headlines = Headline
-                  .then { |relation | search_by_categories(relation, categories) }
-      render json: { headlines: }
+                  .then { |relation| search_by_categories(relation, categories) }
+      render json: { headlines: }, include: %i[forwardRefs backwardRefs]
     end
 
     def search_by_categories(relation, categories)
@@ -24,18 +24,19 @@ module Api
     end
 
     def show
-      render json: { headline: Headline.find(params[:id]) }
+      headline = Headline.find(params[:id])
+      render json: { headline: }, include: %i[forwardRefs backwardRefs]
     end
 
     def create
       headline = Headline.create!(headline_params)
-      render json: { headline: }
+      render json: { headline: }, include: %i[forwardRefs backwardRefs]
     end
 
     def update
       headline = Headline.find(params[:id])
       headline.update!(headline_params)
-      render json: { headline: }
+      render json: { headline: }, include: %i[forwardRefs backwardRefs]
     end
 
     def destroy

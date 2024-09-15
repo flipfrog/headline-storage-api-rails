@@ -10,11 +10,18 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_09_08_080207) do
+ActiveRecord::Schema[7.1].define(version: 2024_09_09_092828) do
   create_table "headlines", force: :cascade do |t|
     t.string "title"
     t.string "category"
     t.string "description"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "headlines_headlines", force: :cascade do |t|
+    t.integer "origin_id"
+    t.integer "end_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
