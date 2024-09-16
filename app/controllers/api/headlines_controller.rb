@@ -31,6 +31,7 @@ module Api
 
     def create
       headline = Headline.create!(headline_params)
+      headline.forwardRef_ids = params[:forward_ref_ids].uniq if params[:forward_ref_ids].is_a?(Array)
       render json: { headline: }, include: %i[forwardRefs backwardRefs]
     end
 

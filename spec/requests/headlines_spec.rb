@@ -138,7 +138,47 @@ describe 'Headlines' do
         )
       end
 
-      it 'stores headline with refs'
+      it 'stores headline with refs' do
+        headline = create(:headline, { title: 'test title 2', category: 'book-digital' })
+        params['forward_ref_ids'] = [headline.id]
+
+        subject
+
+        expect(response).to have_http_status(:success)
+        expect(Headline.last).to have_attributes(
+          title: 'test title',
+          category: 'sound-cd',
+          description: 'test description'
+        )
+        expect(Headline.last.forwardRefs.pluck('id')).to eq([headline.id])
+      end
+
+      it 'store headline with duplicate forward refs to unique ids' do
+        headline = create(:headline, { title: 'test title 2', category: 'book-paper' })
+        params['forward_ref_ids'] = [headline.id, headline.id]
+
+        subject
+
+        expect(response).to have_http_status(:success)
+        expect(Headline.last).to have_attributes(
+          title: 'test title',
+          category: 'sound-cd',
+          description: 'test description'
+        )
+        expect(Headline.last.forwardRefs.pluck('id')).to eq([headline.id])
+      end
+
+      it 'store headline ignoring forward_ref_ids which is not array' do
+        params['forward_ref_ids'] = 'invalid'
+        subject
+
+        expect(response).to have_http_status(:success)
+        expect(Headline.last).to have_attributes(
+          title: 'test title',
+          category: 'sound-cd',
+          description: 'test description'
+        )
+      end
     end
 
     context 'with invalid params' do
@@ -157,10 +197,6 @@ describe 'Headlines' do
 
         expect(response).to have_http_status(422)
       end
-
-      it 'to store headline with duplicate forward refs'
-
-      it 'to store headline with duplicate backward refs'
     end
   end
 
