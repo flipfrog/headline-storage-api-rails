@@ -165,7 +165,7 @@ describe 'Headlines' do
           category: 'sound-cd',
           description: 'test description'
         )
-        expect(Headline.last.forwardRefs.pluck('id')).to eq([headline.id])
+        expect(Headline.last.forwardRef_ids).to eq([headline.id])
       end
 
       it 'store headline ignoring forward_ref_ids which is not array' do
@@ -213,7 +213,7 @@ describe 'Headlines' do
         subject
 
         expect(response).to have_http_status(:success)
-        expect(Headline.find(headline.id)).to have_attributes(
+        expect(Headline.first).to have_attributes(
           title: 'test title-x',
           category: 'sound-vinyl',
           description: 'test description'
@@ -224,14 +224,53 @@ describe 'Headlines' do
         params['description'] = nil
         subject
 
-        expect(Headline.find(headline.id)).to have_attributes(
+        expect(Headline.first).to have_attributes(
           title: 'test title-x',
           category: 'sound-vinyl',
           description: nil
         )
       end
 
-      it 'updates headline with refs'
+      it 'updates headline with refs' do
+        ref = create(:headline, { title: 'test title ref', category: 'book-digital' })
+        params['forward_ref_ids'] = [ref.id]
+
+        subject
+
+        expect(response).to have_http_status(:success)
+        expect(Headline.first).to have_attributes(
+          title: 'test title-x',
+          category: 'sound-vinyl',
+          description: 'test description'
+        )
+        expect(Headline.first.forwardRef_ids).to eq([ref.id])
+        expect(ref.backwardRef_ids).to eq([headline.id])
+      end
+
+      it 'updates headline with duplicate forward refs to unique ids' do
+        ref = create(:headline, { title: 'test title ref', category: 'book-digital' })
+        params['forward_ref_ids'] = [ref.id, ref.id]
+
+        subject
+
+        expect(response).to have_http_status(:success)
+        expect(Headline.first.forwardRef_ids).to eq([ref.id])
+        expect(ref.backwardRef_ids).to eq([headline.id])
+      end
+
+      it 'updates headline ignoring forward_ref_ids which is not array' do
+        params['forward_ref_ids'] = 'invalid'
+
+        subject
+
+        expect(response).to have_http_status(:success)
+        expect(Headline.first).to have_attributes(
+          title: 'test title-x',
+          category: 'sound-vinyl',
+          description: 'test description'
+        )
+        expect(headline.forwardRef_ids).to eq([])
+      end
     end
 
     context 'with invalid params' do
@@ -250,10 +289,6 @@ describe 'Headlines' do
 
         expect(response).to have_http_status(422)
       end
-
-      it 'to update headline with duplicate forward refs'
-
-      it 'to update headline with duplicate backward refs'
     end
   end
 

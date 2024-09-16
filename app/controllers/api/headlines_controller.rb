@@ -30,20 +30,25 @@ module Api
     end
 
     def create
-      headline = Headline.create!(headline_params)
-      headline.forwardRef_ids = params[:forward_ref_ids].uniq if params[:forward_ref_ids].is_a?(Array)
-      render json: { headline: }, include: %i[forwardRefs backwardRefs]
+      @headline = Headline.create!(headline_params)
+      update_forward_refs
+      render json: { headline: @headline }, include: %i[forwardRefs backwardRefs]
     end
 
     def update
-      headline = Headline.find(params[:id])
-      headline.update!(headline_params)
-      render json: { headline: }, include: %i[forwardRefs backwardRefs]
+      @headline = Headline.find(params[:id])
+      @headline.update!(headline_params)
+      update_forward_refs
+      render json: { headline: @headline }, include: %i[forwardRefs backwardRefs]
     end
 
     def destroy
       headline = Headline.find(params[:id])
       headline.destroy!
+    end
+
+    def update_forward_refs
+      @headline.forwardRef_ids = params[:forward_ref_ids].uniq if params[:forward_ref_ids].is_a?(Array)
     end
   end
 end
