@@ -150,7 +150,8 @@ describe 'Headlines' do
           category: 'sound-cd',
           description: 'test description'
         )
-        expect(Headline.last.forwardRefs.pluck('id')).to eq([headline.id])
+        expect(Headline.last.forwardRef_ids).to eq([headline.id])
+        expect(Headline.first.backwardRef_ids).to eq([Headline.last.id])
       end
 
       it 'store headline with duplicate forward refs to unique ids' do
@@ -269,7 +270,7 @@ describe 'Headlines' do
           category: 'sound-vinyl',
           description: 'test description'
         )
-        expect(headline.forwardRef_ids).to eq([])
+        expect(Headline.first.forwardRef_ids).to eq([])
       end
     end
 
@@ -311,14 +312,14 @@ describe 'Headlines' do
         headline2 = create(:headline, { title: 'test title 2', category: 'sound-file' })
         headline.forwardRefs << headline2
         headline.reload
-        expect(headline2.backwardRefs.pluck('id')).to eq([headline.id])
+        expect(Headline.last.backwardRef_ids).to eq([headline.id])
 
         subject
 
         expect(response).to have_http_status(:success)
         expect(Headline.exists?(headline.id)).to eq(false)
         expect(Headline.exists?(headline2.id)).to eq(true)
-        expect(headline2.backwardRefs).to eq([])
+        expect(Headline.last.backwardRef_ids).to eq([])
       end
     end
 

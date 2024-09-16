@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Api
   # Headline Resource Class
   class HeadlinesController < ActionController::API
