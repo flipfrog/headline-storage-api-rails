@@ -7,8 +7,9 @@ Rails.application.routes.draw do
 
   # Defines the root path route ("/")
   # root "posts#index"
-  #root "headlines#index"
+
   namespace :api do
     resources :headlines, except: [:edit]
+    resources :categories, only: :index
   end
 end
