@@ -248,7 +248,7 @@ describe 'Headlines' do
         expect(ref.backwardRef_ids).to eq([headline.id])
       end
 
-      it 'updates headline with duplicate forward refs to unique ids' do
+      it 'updates headline with duplicate forward refs within forward refs to unique ids' do
         ref = create(:headline, { title: 'test title ref', category: 'book-digital' })
         params['forward_ref_ids'] = [ref.id, ref.id]
 
@@ -257,6 +257,18 @@ describe 'Headlines' do
         expect(response).to have_http_status(:success)
         expect(Headline.first.forwardRef_ids).to eq([ref.id])
         expect(ref.backwardRef_ids).to eq([headline.id])
+      end
+
+      it 'updates headline with duplicate forward refs within backward refs end to no addition' do
+        ref = create(:headline, { title: 'test title ref', category: 'book-digital' })
+        ref.forwardRef_ids = [headline.id]
+        params['forward_ref_ids'] = [ref.id]
+
+        subject
+
+        expect(response).to have_http_status(:success)
+        expect(Headline.first.forwardRef_ids).to eq([])
+        expect(Headline.first.backwardRef_ids).to eq([ref.id])
       end
 
       it 'updates headline ignoring forward_ref_ids which is not array' do

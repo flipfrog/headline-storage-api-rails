@@ -5,7 +5,7 @@ module Api
   class HeadlinesController < ActionController::API
 
     def headline_params
-      params.require(:headline).permit(:category, :title, :description)
+      params.require(:headline).permit(:category, :title, :description, forward_ref_ids: [])
     end
 
     def index
@@ -50,7 +50,9 @@ module Api
     end
 
     def update_forward_refs
-      @headline.forwardRef_ids = params[:forward_ref_ids].uniq if params[:forward_ref_ids].is_a?(Array)
+      request_forward_ref_ids = params['forward_ref_ids'] if params['forward_ref_ids'].is_a?(Array)
+      request_forward_ref_ids = (request_forward_ref_ids || []).excluding @headline.backwardRef_ids
+      @headline.forwardRef_ids = request_forward_ref_ids.uniq
     end
   end
 end
