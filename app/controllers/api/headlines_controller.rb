@@ -32,15 +32,19 @@ module Api
     end
 
     def create
-      @headline = Headline.create!(headline_params)
-      update_forward_refs
+      ActiveRecord::Base.transaction do
+        @headline = Headline.create!(headline_params)
+        update_forward_refs
+      end
       render json: { headline: @headline }, include: %i[forwardRefs backwardRefs]
     end
 
     def update
       @headline = Headline.find(params[:id])
-      @headline.update!(headline_params)
-      update_forward_refs
+      ActiveRecord::Base.transaction do
+        @headline.update!(headline_params)
+        update_forward_refs
+      end
       render json: { headline: @headline }, include: %i[forwardRefs backwardRefs]
     end
 
