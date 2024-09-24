@@ -9,3 +9,12 @@ migrate:
 test:
 	bin/rspec spec/
 
+act-test:
+	act -j test --container-architecture linux/amd64
+
+act-lint:
+	act -j lint --container-architecture linux/amd64
+
+act:
+	act push --container-architecture linux/amd64
+
